@@ -37,7 +37,7 @@ class EfiSubscriptionDatabase
                 Capsule::schema()->create('tblschedulepaymentefi', function ($table) {
                     $table->increments('id');
                     $table->unsignedInteger('invoiceid');
-                    $table->unsignedInteger('relid')->unique();
+                    $table->unsignedInteger('relid');
                     $table->string('payment_token');
                     $table->date('date');
                     $table->foreign('invoiceid')->references('id')->on('tblinvoices')->onDelete('cascade');
