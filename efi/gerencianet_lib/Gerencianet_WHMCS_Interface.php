@@ -152,9 +152,6 @@ function buttonGerencianet($errorMessages=null, $link=null, $discount=0, $discou
         }
         .botao:hover {
             background-color: #ff751a;
-            background-image:url("modules/gateways/efi/gerencianet_lib/images/gn-cinza.png");
-            background-size: 35px;
-            background-repeat: no-repeat;
             color: white;
             background-position-x: 10px;
             background-position-y: 5.5px;

@@ -51,6 +51,7 @@ class CardProcessorSubscription
     public function __construct(int $invoiceId, array $subscriptionData)
     {
         $this->invoice = Invoice::find($invoiceId);
+        
         $this->subscriptionData = $subscriptionData;
         $this->gatewayParams = getGatewayVariables('efi');
         $this->efiSubscriptionDatabase = new EfiSubscriptionDatabase();
@@ -69,18 +70,20 @@ class CardProcessorSubscription
         $params['paramsCartao'] = json_decode($this->subscriptionData[0]->customer, true);
         $params['systemurl'] = Setting::getValue('SystemURL');
         $params['amount'] = $this->invoice->total;
-
+        
         if ($this->verifyPaymentSchedule()) {
             $existingChargeConfirm = existingChargeCredit($params, $this->gnIntegration);
-
+            
             $existingCharge = $existingChargeConfirm['existCharge'];
 
             
 
-            if ((!$existingCharge) && ($existingCharge != null)) {
+            if (!$existingCharge) {
+                
                 createCard($params, $this->gnIntegration, [], false);
             }
         } else {
+           
             $this->createPaymentSchedule();
         }
     }
@@ -90,9 +93,9 @@ class CardProcessorSubscription
     private function verifyPaymentSchedule(): bool
     {
         $permitionDate = Carbon::parse($this->invoice->duedate)->isToday();  
-
+        
         $permitionStatus = ($this->invoice->status != 'Paid'); // Verifica se a fatura não foi paga
-
+        
  
         return ($permitionDate && $permitionStatus);
     }
@@ -104,8 +107,8 @@ class CardProcessorSubscription
     {
         try {
             $permitionStatus = ($this->invoice->status != 'Paid');
-
-            if ($permitionStatus) {
+            $havePayment = $this->efiSubscriptionDatabase->getScheduledPaymentByInvoiceId($this->invoice->id);
+            if ($permitionStatus && !$havePayment ) {
                 $customer = json_decode($this->subscriptionData[0]->customer, true);
                 foreach ($this->subscriptionData as $subscription) {
                     $this->efiSubscriptionDatabase->addScheduledPayment($this->invoice->id, $customer['payment_token'], $this->invoice->duedate, $subscription->relid);

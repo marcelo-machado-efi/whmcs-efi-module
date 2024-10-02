@@ -13,16 +13,15 @@ class PreCronProcessor
     public function handler(array $vars)
     {
         try {
-            // Busca todos os pagamento agendados
-            $relIds = $this->getTodayRelids();
-
+            
 
             $payments = $this->getTodayPayments();
-
+            
             // Consulta a tabela tblsubscriptionefi com os relIds
-            $subscriptionData = $this->getSubscriptionDataByRelIds($relIds);
-
+            
             foreach ($payments as $payment) {
+                $subscriptionData = $this->getSubscriptionDataByRelId($payment->relid);
+                
                 $subscriptionProcessor = new CardProcessorSubscription($payment->invoiceid, $subscriptionData);
                
                 $subscriptionProcessor->generateChargeToInvoice();
@@ -35,12 +34,13 @@ class PreCronProcessor
 
     /**
      * Consulta a tabela tblsubscriptionefi com os relids filtrados
-     * @param array $relIds
+     * @param int $relId
      * @return array|null - Dados da tabela tblsubscriptionefi ou null
      */
-    private function getSubscriptionDataByRelIds(array $relIds): ?array
+    private function getSubscriptionDataByRelId(int $relId): ?array
     {
         try {
+            $relIds = [$relId];
             $subscriptionsList = Capsule::table('tblsubscriptionefi')
                 ->whereIn('relid', $relIds)
                 ->get()

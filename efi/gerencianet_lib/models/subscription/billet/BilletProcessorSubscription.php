@@ -3,6 +3,7 @@
 require_once realpath(__DIR__ . '/../../../functions/gateway/Billet.php');
 require_once realpath(__DIR__ . '/../../../../../../../init.php');
 require_once realpath(__DIR__ . '/../../../GerencianetIntegration.php');
+
 use WHMCS\Config\Setting;
 
 
@@ -23,7 +24,7 @@ class BilletProcessorSubscription
      * @var array Dados da assinatura recuperado da tabela tblsubscriptionefi
      */
     private $subscriptionData;
-    
+
     /**
      * @var array Dados referentes ao gateway
      */
@@ -52,7 +53,8 @@ class BilletProcessorSubscription
      * Função responsável por gerar a cobrança referente a fatura do cliente
      * 
      */
-    public function generateChargeToInvoice() : void {
+    public function generateChargeToInvoice(): void
+    {
         $params = [];
         $params = $this->gatewayParams;
         $params['invoiceid'] = $this->invoiceId;
@@ -61,14 +63,11 @@ class BilletProcessorSubscription
         $existingChargeConfirm = existingCharge($params, $this->gnIntegration);
 
         $existingCharge = $existingChargeConfirm['existCharge'];
-    
-        
-       
-    
-        if ((!$existingCharge) && ($existingCharge != null)) {
-            createBillet($params,$this->gnIntegration,[],false);
+
+
+
+        if (!$existingCharge) {
+            createBillet($params, $this->gnIntegration, [], false);
         }
-        
-        
     }
 }

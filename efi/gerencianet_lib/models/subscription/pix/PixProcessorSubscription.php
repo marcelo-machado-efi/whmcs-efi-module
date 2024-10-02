@@ -2,7 +2,9 @@
 
 require_once realpath(__DIR__ . '/../../../functions/gateway/PIX.php');
 require_once realpath(__DIR__ . '/../../../../../../../init.php');
-require_once realpath(__DIR__ . '/../../../GerencianetIntegration.php');
+require_once realpath(__DIR__ . '/../../../../gerencianet-sdk/autoload.php');
+
+use Gerencianet\Gerencianet;
 
 use WHMCS\Config\Setting;
 use WHMCS\Billing\Invoice;
@@ -31,7 +33,7 @@ class PixProcessorSubscription
     private $gatewayParams;
 
     /**
-     * @var GerencianetIntegration 
+     * @var Gerencianet 
      */
     private $gnIntegration;
 
@@ -46,7 +48,32 @@ class PixProcessorSubscription
         $this->invoice = Invoice::find($invoiceId);
         $this->subscriptionData = $subscriptionData;
         $this->gatewayParams = getGatewayVariables('efi');
-        $this->gnIntegration = new GerencianetIntegration($this->gatewayParams['clientIdProd'], $this->gatewayParams['clientSecretProd'], $this->gatewayParams['clientIdSandbox'], $this->gatewayParams['clientSecretSandbox'], $this->gatewayParams['sandbox'], $this->gatewayParams['idConta']);
+        // Pix Parameters
+        $pixCert = $this->gatewayParams['pixCert'];
+
+        // Boolean Parameters
+        $mtls    = ($this->gatewayParams['mtls'] == 'on');
+        $debug   = ($this->gatewayParams['debug'] == 'on');
+        $sandbox = ($this->gatewayParams['sandbox'] == 'on');
+
+        // Client Authentication Parameters
+        $clientIdSandbox     = $this->gatewayParams['clientIdSandbox'];
+        $clientIdProd        = $this->gatewayParams['clientIdProd'];
+        $clientSecretSandbox = $this->gatewayParams['clientSecretSandbox'];
+        $clientSecretProd    = $this->gatewayParams['clientSecretProd'];
+
+        $this->gnIntegration = Gerencianet::getInstance(
+            array(
+                'client_id' => $sandbox ? $clientIdSandbox : $clientIdProd,
+                'client_secret' => $sandbox ? $clientSecretSandbox : $clientSecretProd,
+                'certificate' => $pixCert,
+                'sandbox' => $sandbox,
+                'debug' => $debug,
+                'headers' => [
+                    'x-skip-mtls-checking' => $mtls ? 'false' : 'true'
+                ]
+            )
+        );
     }
 
     /**
@@ -66,16 +93,17 @@ class PixProcessorSubscription
         // Verifying if exists a Pix Charge for current invoiceId
 
         $existingPixCharge = getPixCharge($this->invoice->id);
-
+        
 
 
         if (empty($existingPixCharge)) {
 
             // Creating a new Pix Charge
-
+            
             $newPixCharge = createPixCharge($this->gnIntegration, $params);
+            
 
-
+        
 
             if (isset($newPixCharge['txid'])) {
 
@@ -83,6 +111,6 @@ class PixProcessorSubscription
 
                 storePixChargeInfo($newPixCharge, $params);
             }
-        }
+        } 
     }
 }

@@ -1040,7 +1040,7 @@ function definedCreditCardPayment($gatewayParams)
     }
     $returnPaymentCard = createCard($gatewayParams, $gnIntegration, $errorMessages, $existingCharge);
     $isSubscription = isset($gatewayParams['paramsCartao']['subscriptionCard']);
-    $pagamentoAprovado = strpos($returnPaymentCard, 'Pagamento Aprovado');
+    $pagamentoAprovado =  strpos($returnPaymentCard, 'Pagamento Aprovado');
     if ($isSubscription && $pagamentoAprovado !== false) {
         $invoiceProcessor = new InvoiceProcessor($gatewayParams['invoiceid']);
         $handlerSubscription = new SubscriptionEfiHandler();

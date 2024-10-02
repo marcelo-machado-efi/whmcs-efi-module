@@ -18,14 +18,14 @@ class InvoiceCreationProcessor
 
             // Obtém o invoiceId a partir das variáveis do hook
             $invoiceId = $vars['invoiceid'];
-
             // Busca todos os relid associados à fatura
             $relIds = $this->getRelIdsFromInvoice($invoiceId);
-
+            
             // Consulta a tabela tblsubscriptionefi com os relIds
             $subscriptionData = $this->getSubscriptionDataByRelIds($relIds);
+            
             $permitionToPay = $this->verifyPermitionTopay($subscriptionData);
-
+            
             if ($permitionToPay) {
                 switch ($subscriptionData[0]->payment_method) {
                     case 'billet':
@@ -37,6 +37,7 @@ class InvoiceCreationProcessor
                         $subscriptionProcessor->generateChargeToInvoice();
                         break;
                     case 'pix':
+                        
                         $subscriptionProcessor = new PixProcessorSubscription($invoiceId, $subscriptionData);
                         $subscriptionProcessor->generateChargeToInvoice();
                         break;
@@ -59,6 +60,7 @@ class InvoiceCreationProcessor
         $primeiroValor = $subscriptionData[0]->payment_method ?? null;
 
         if (empty($subscriptionData)) {
+            
             return false;
         }
 
@@ -66,10 +68,11 @@ class InvoiceCreationProcessor
         // Percorre o array e compara o valor de cada elemento
         foreach ($subscriptionData as $item) {
             if ($item->payment_method !== $primeiroValor) {
+                
                 return false;
             }
         }
-
+     
         return true;
     }
 
