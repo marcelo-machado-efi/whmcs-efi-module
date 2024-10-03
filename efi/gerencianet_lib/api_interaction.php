@@ -53,7 +53,8 @@ function getGerencianetApiInstance($gatewayParams)
             'debug' => $debug,
             'headers' => [
                 'x-skip-mtls-checking' => $mtls ? 'false' : 'true', // Needs to be string
-                'x-idempotency-key' => uniqid(uniqidReal(), true) // For open finance usage
+                'x-idempotency-key' => uniqid(uniqidReal(), true), // For open finance usage
+                'efi-whmcs-version'=> '2.3'
             ]
         )
     );

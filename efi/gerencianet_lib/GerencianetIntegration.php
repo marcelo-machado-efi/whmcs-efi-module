@@ -45,6 +45,9 @@ class GerencianetIntegration
 				'sandbox' => false
 			);
 		}
+		$gn_credentials_options['headers'] = [
+			'efi-whmcs-version'=> '2.3'
+		];
 		return $gn_credentials_options;
 	}
 	public function testIntegration()

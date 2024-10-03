@@ -11,7 +11,7 @@
  */
 function ValidationFieldsAdmin($params)
 {
-    // Verifica o ambiente e a versão do TLS
+    // Verifica o ambiente e a version do TLS
     environment();
     tlsVersion();
 
@@ -66,9 +66,9 @@ function tlsVersion()
 
     if (!($tls_version > 1.1)) {
         generateException('
-                                 <span  style="line-height: 2;">Identificamos que a sua hospedagem não suporta uma versão segura do TLS(Transport Layer Security) para se comunicar  
+                                 <span  style="line-height: 2;">Identificamos que a sua hospedagem não suporta uma version segura do TLS(Transport Layer Security) para se comunicar  
                                  com a Efí. Para conseguir gerar transações, será necessário que contate o administrador do seu servidor e solicite que 
-                                 a hospedagem seja atualizada para suportar comunicações por meio do TLS na versão mínima 1.2. 
+                                 a hospedagem seja atualizada para suportar comunicações por meio do TLS na version mínima 1.2. 
                                  Em caso de dúvidas e para maiores informações, entre cm contato com    a Equipe Técnica da Efí at ravés do suporte da empresa.</span><br><br>
                             ');
     }
