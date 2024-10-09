@@ -262,9 +262,11 @@ function createWebhook($api_instance, $gatewayParams)
     $systemUrl   = $gatewayParams['systemurl'];
 
     $callbackUrl = $systemUrl . 'modules/gateways/callback/efi/pix.php';
+    $mtls = ($gatewayParams['mtls'] != 'on');
 
-
-
+    if ($mtls) {
+        $callbackUrl = generateWebhookUrlWithHmac($callbackUrl, $gatewayParams['clientIdProd']);
+    }
     $requestParams = [
 
         'chave' => $gatewayParams['pixKey']
@@ -484,7 +486,7 @@ function refundCharge($api_instance, $gatewayParams)
 
     if (empty($e2eId)) {
 
-        showException('Efí Exception', array("Fatura #$invoiceId não possui pagamentos a serem reembolsados."));
+        showException('Efí Exception', array("Fatura #$invoiceId não possuí pagamentos a serem reembolsados."));
 
 
 
@@ -515,3 +517,31 @@ function refundCharge($api_instance, $gatewayParams)
     }
 
 }
+/**
+ * Gera uma URL com um HMAC.
+ *
+ * @param string $url A URL base para a qual o HMAC será gerado.
+ * @param string $secret_key A chave secreta utilizada para gerar o HMAC.
+ * @return string A URL com o HMAC anexado como parâmetro.
+ * @throws InvalidArgumentException Se a URL ou a chave secreta forem inválidas.
+ */
+function generateWebhookUrlWithHmac(string $url, string $secret_key): string {
+    
+    if (!filter_var($url, FILTER_VALIDATE_URL)) {
+        throw new InvalidArgumentException('A URL fornecida não é válida.');
+    }
+
+    
+    if (empty($secret_key)) {
+        throw new InvalidArgumentException('A chave secreta não pode ser vazia.');
+    }
+
+    $hmac = hash_hmac('sha256', $url, $secret_key);
+
+    // Anexa o HMAC como parâmetro à URL
+    $separator = strpos($url, '?') === false ? '?' : '&';
+    $urlWithHmac = $url . $separator . 'hmac=' . $hmac;
+    $urlWithIgnoreAttr = $urlWithHmac . '&ignorar=';
+    return $urlWithIgnoreAttr;
+}
+
