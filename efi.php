@@ -1,6 +1,8 @@
 <?php
 
 require 'efi/gerencianet-sdk/autoload.php';
+require_once 'efi/vendor/autoload.php';
+
 
 include_once 'efi/gerencianet_lib/api_interaction.php';
 
@@ -32,10 +34,17 @@ include_once 'efi/gerencianet_lib/models/subscription/database/SubscriptionEfiDa
 
 include_once 'efi/gerencianet_lib/models/subscription/handler/SubscriptionEfiHandler.php';
 
-use WHMCS\Billing\Invoice;
+use PaymentGateway\Methods\PaymentMethodFactory;
+use PaymentGateway\Database\EfiDatabases;
+use PaymentGateway\Database\BoletoDAO;
+use PaymentGateway\Database\PixDAO;
+use PaymentGateway\DTOs\Config\ConfigAPIDTO;
+use PaymentGateway\Methods\Pix\PixQrCodeGenerator;
+
+use Efi\EfiPay;
 
 
-
+use PaymentGateway\Logging\TransactionLogger;
 
 if (!defined('WHMCS')) {
 
@@ -569,6 +578,8 @@ function efi_config_validate($params)
     createGerencianetPixTable();
     OpenFinanceEfi::createEfiOFTable();
     EfiSubscriptionDatabase::createEfiSubscriptionTable();
+    EfiDatabases::create();
+
     ValidationFieldsAdmin($params);
 }
 
@@ -685,58 +696,33 @@ function efi_link($gatewayParams)
 
 
 
-    $existingPixCharge = getPixCharge($gatewayParams['invoiceid']);
 
 
 
-    if (!empty($existingPixCharge)) {
+    $gnIntegration = new GerencianetIntegration($gatewayParams['clientIdProd'], $gatewayParams['clientSecretProd'], $gatewayParams['clientIdSandbox'], $gatewayParams['clientSecretSandbox'], $gatewayParams['sandbox'], $gatewayParams['idConta']);
 
-        $api_instance = getGerencianetApiInstance($gatewayParams);
+    $existingChargeConfirm = existingChargeCredit($gatewayParams, $gnIntegration);
 
-        $locId =  $existingPixCharge['locid'];
+    $existingCharge = $existingChargeConfirm['existCharge'];
 
-        return createQRCode($api_instance, $locId);
-    } else {
+    $code = $existingChargeConfirm['code'];
 
+    if ($existingCharge) {
 
-
-        $gnIntegration = new GerencianetIntegration($gatewayParams['clientIdProd'], $gatewayParams['clientSecretProd'], $gatewayParams['clientIdSandbox'], $gatewayParams['clientSecretSandbox'], $gatewayParams['sandbox'], $gatewayParams['idConta']);
-
-        $existingChargeConfirm = existingCharge($gatewayParams, $gnIntegration);
-
-
-
-        $existingCharge = $existingChargeConfirm['existCharge'];
-
-        $code = $existingChargeConfirm['code'];
-
-        if ($existingCharge) {
-
-            return $code;
-        } else {
-
-            $existingChargeConfirm = existingChargeCredit($gatewayParams, $gnIntegration);
-
-            $existingCharge = $existingChargeConfirm['existCharge'];
-
-            $code = $existingChargeConfirm['code'];
-
-            if ($existingCharge) {
-
-                return $code;
-            }
-        }
+        return $code;
     }
 
 
 
 
 
-    if (!isset($_POST['optionPayment']) || $_POST['optionPayment'] == '') {
+
+
+    if (!isset($_POST['paymentType']) || $_POST['paymentType'] == '') {
         return $paymentOptionsScript;
     } else {
 
-        switch ($_POST['optionPayment']) {
+        switch ($_POST['paymentType']) {
 
             case 'pix':
                 return definedPixPayment($gatewayParams);
@@ -746,11 +732,11 @@ function efi_link($gatewayParams)
                 return definedBilletPayment($gatewayParams);
                 break;
 
-            case 'credit':
+            case 'creditCard':
                 return definedCreditCardPayment($gatewayParams);
                 break;
 
-            case 'openfinance':
+            case 'openFinance':
                 return definedOpenFinancePayment($gatewayParams);
                 break;
 
@@ -842,53 +828,20 @@ function definedOpenFinancePayment($gatewayParams)
 function definedPixPayment($gatewayParams)
 {
 
+
     $gatewayParams['paramsPix'] = $_POST;
 
 
+    $hasChargeToInvoice =  PixDAO::findByInvoiceId($gatewayParams["invoiceid"]);
 
-    validateRequiredParams($gatewayParams);
-
-
-
-    // Getting API Instance
-
-    $api_instance = getGerencianetApiInstance($gatewayParams);
-
-
-
-
-
-
-
-    // Verifying if exists a Pix Charge for current invoiceId
-
-    $existingPixCharge = getPixCharge($gatewayParams['invoiceid']);
-
-
-
-    if (empty($existingPixCharge)) {
-
-        // Creating a new Pix Charge
-
-        $newPixCharge = createPixCharge($api_instance, $gatewayParams);
-
-
-
-        if (isset($newPixCharge['txid'])) {
-
-            // Storing Pix Charge Infos on table 'tblgerencianetpix' for later use
-
-            storePixChargeInfo($newPixCharge, $gatewayParams);
-        }
+    if ($hasChargeToInvoice) {
+        $configApi = new ConfigAPIDTO($gatewayParams);
+        $api_instance = new EfiPay($configApi->getApiConfig());
+        $qrCode = new PixQrCodeGenerator($hasChargeToInvoice->locid, $api_instance);
+        return $qrCode->getImgQrCode();
     }
 
-
-
-    // Generating QR Code
-
-    $locId = $existingPixCharge ? $existingPixCharge['locid'] : $newPixCharge['loc']['id'];
-    $qrCode = createQRCode($api_instance, $locId);
-    $isSubscription = isset($gatewayParams['paramsPix']['subscriptionPix']);
+    $isSubscription = !isset($gatewayParams['paramsPix']['subscriptionPix']);
     if ($isSubscription) {
         $invoiceProcessor = new InvoiceProcessor($gatewayParams['invoiceid']);
         $handlerSubscription = new SubscriptionEfiHandler();
@@ -897,7 +850,13 @@ function definedPixPayment($gatewayParams)
             $handlerSubscription->createSubscription('pix', intval($item['relid']), $gatewayParams['paramsPix']);
         }
     }
-    return $qrCode;
+
+
+
+    $payment = PaymentMethodFactory::create('pix', $gatewayParams);
+    $qrCodeImg = $payment->processPayment();
+
+    return $qrCodeImg;
 }
 
 
@@ -905,87 +864,26 @@ function definedPixPayment($gatewayParams)
 function definedBilletPayment($gatewayParams)
 
 {
-
-
+    $invoiceId = $gatewayParams['invoiceid'];
+    $hasChargeToInvoice = BoletoDAO::findByInvoiceId($invoiceId);
+    if ($hasChargeToInvoice) {
+        return  buttonGerencianet(null, $hasChargeToInvoice->link_pdf);
+    }
 
 
     $gatewayParams['paramsBoleto'] = $_POST;
 
-    $errorMessages = array();
-
-    $errorMessages = validationParams($gatewayParams);
+    $paymentMethodEfi = PaymentMethodFactory::create('boleto', $gatewayParams);
 
 
-
-    /* ************************************************ Define mensagens de erro ***************************************************/
-
-
-
-
-
-
-
-
-
-
-
-    /* ******************************************** Gateway Configuration Parameters ******************************************* */
-
-    $descontoBoleto         = $gatewayParams['descontoBoleto'];
-
-    $tipoDesconto           = $gatewayParams['tipoDesconto'];
-
-    $minValue               = 5;
-
-    $debug            = $gatewayParams['debug'];
-
-    $adminWHMCS             = $gatewayParams['whmcsAdmin'];
-
-    if ($adminWHMCS == '' || $adminWHMCS == null) {
-
-        array_push($errorMessages, INTEGRATION_ERROR_MESSAGE);
-
-        if ($debug == "on")
-
-            logTransaction('efi', 'O campo - Usuario administrador do WHMCS - está preenchido incorretamente', 'Erro de Integração');
-
-        return send_errors($errorMessages);
+    $paymentSuccess = $paymentMethodEfi->processPayment();
+    if ($paymentSuccess) {
+        return '<script type="text/javascript">
+            window.location.reload();
+          </script>';
     }
 
 
-
-    /* ***************************** Verifica se já existe um boleto para o pedido em questão *********************************** */
-
-
-
-
-    $gnIntegration = new GerencianetIntegration($gatewayParams['clientIdProd'], $gatewayParams['clientSecretProd'], $gatewayParams['clientIdSandbox'], $gatewayParams['clientSecretSandbox'], $gatewayParams['sandbox'], $gatewayParams['idConta']);
-
-    $existingChargeConfirm = existingCharge($gatewayParams, $gnIntegration);
-
-    $existingCharge = $existingChargeConfirm['existCharge'];
-
-    $code = $existingChargeConfirm['code'];
-
-
-
-    if ($existingCharge) {
-
-        return $code;
-    }
-
-    $invoiceAmount              = $gatewayParams['amount'];
-
-    if ($invoiceAmount < $minValue) {
-
-        $limitMsg = "<div id=limit-value-msg style='font-weight:bold; color:#cc0000;'>Transação Não permitida: Você está tentando pagar uma fatura de<br> R$ $invoiceAmount. Para gerar o boleto Gerencianet, o valor mínimo do pedido deve ser de R$ $minValue</div>";
-
-        return $limitMsg;
-    }
-
-    /* ************************************************* Invoice parameters *************************************************** */
-
-    $linkPagamento = createBillet($gatewayParams, $gnIntegration, $errorMessages, $existingCharge);
     $isSubscription = isset($gatewayParams['paramsBoleto']['subscriptionBillet']);
     if ($isSubscription) {
         $invoiceProcessor = new InvoiceProcessor($gatewayParams['invoiceid']);
@@ -995,12 +893,6 @@ function definedBilletPayment($gatewayParams)
             $handlerSubscription->createSubscription('billet', intval($item['relid']), $gatewayParams['paramsBoleto']);
         }
     }
-    if (strpos($linkPagamento, 'modules/gateways/efi/gerencianet_lib/gerencianet_errors.php')) {
-
-        return ($linkPagamento);
-    }
-
-    return buttonGerencianet($errorMessages, $linkPagamento, $descontoBoleto, $tipoDesconto);
 }
 
 
@@ -1012,7 +904,6 @@ function definedCreditCardPayment($gatewayParams)
     $gatewayParams['paramsCartao'] = $_POST;
 
 
-    $minValue = 5;
     $errorMessages = array();
 
     $errorMessages = validationParamsCard($gatewayParams);
@@ -1030,14 +921,8 @@ function definedCreditCardPayment($gatewayParams)
         return $code;
     }
 
-    $invoiceAmount              = $gatewayParams['amount'];
 
-    if ($invoiceAmount < $minValue) {
 
-        $limitMsg = "<div id=limit-value-msg style='font-weight:bold; color:#cc0000;'>Transação Não permitida: Você está tentando pagar uma fatura de<br> R$ $invoiceAmount. Para gerar o boleto Efí, o valor mínimo do pedido deve ser de R$ $minValue</div>";
-
-        return $limitMsg;
-    }
     $returnPaymentCard = createCard($gatewayParams, $gnIntegration, $errorMessages, $existingCharge);
     $isSubscription = isset($gatewayParams['paramsCartao']['subscriptionCard']);
     $pagamentoAprovado =  strpos($returnPaymentCard, 'Pagamento Aprovado');

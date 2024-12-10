@@ -20,7 +20,7 @@ function validateRequiredParams($gatewayParams)
 
 {
 
-    
+
 
 
 
@@ -47,9 +47,7 @@ function validateRequiredParams($gatewayParams)
         if (empty($value)) {
 
             $errors[] = "$key é um campo obrigatório. Verificar as configurações do Portal de Pagamento.";
-
         };
-
     };
 
 
@@ -57,9 +55,7 @@ function validateRequiredParams($gatewayParams)
     if (!empty($errors)) {
 
         showException('Exception', $errors);
-
     }
-
 }
 
 
@@ -78,10 +74,10 @@ function validateRequiredParams($gatewayParams)
 
  */
 
-function getPixCharge($invoiceId) {
+function getPixCharge($invoiceId)
+{
 
     return find('tblgerencianetpix', 'invoiceid', $invoiceId);
-
 }
 
 
@@ -102,58 +98,58 @@ function getPixCharge($invoiceId) {
 
  */
 
- function createPixCharge($api_instance, $gatewayParams)
- {
-     // Pix Parameters
-     $pixKey = $gatewayParams['pixKey'];
-     $pixDays = $gatewayParams['pixDays'];
-     $pixDescription = $gatewayParams['description'];
-     $pixDiscount = str_replace('%', '', $gatewayParams['pixDiscount']);
- 
-     if (empty($pixKey)) {
-         showException('Exception', array('Chave Pix não informada. Verificar as configurações do Portal de Pagamento.'));
-     } else {
-         // Calculating pix amount with discount
-         $pixAmount = $gatewayParams['amount'];
-         $total = (double)$pixAmount - ((($pixAmount) * $pixDiscount) / 100);
-         $total = number_format((double)$total, 2, '.', '');
- 
-         $document = $gatewayParams['paramsPix']['clientDocumentPix'];
-         $document = preg_replace('/[^0-9]/', '', $document); // Remove non-numeric characters
- 
-         $devedorAttribute = 'cpf';
-         if (strlen($document) === 14) {
-             $devedorAttribute = 'cnpj';
-         }
- 
-         $requestBody = [
-             'calendario' => [
-                 'expiracao' => $pixDays * 86400 // Multiplying by 86400 (1 day seconds) because the API expects to receive a value in seconds
-             ],
-             'devedor' => [
-                 $devedorAttribute => $document,
-                 'nome' => $gatewayParams['paramsPix']['clientNamePix']
-             ],
-             'valor' => [
-                 'original' => strval($total) // String value from amount
-             ],
-             'chave' => $pixKey,
-             "infoAdicionais" => [
-                 [
-                     "nome" => "Pagamento em",
-                     "valor" => $gatewayParams['companyname']
-                 ],
-                 [
-                     "nome" => "Número do Pedido",
-                     "valor" => "#" . $gatewayParams['invoiceid']
-                 ]
-             ]
-         ];
- 
-         return createImmediateCharge($api_instance, $requestBody);
-     }
- }
- 
+function createPixCharge($api_instance, $gatewayParams)
+{
+    // Pix Parameters
+    $pixKey = $gatewayParams['pixKey'];
+    $pixDays = $gatewayParams['pixDays'];
+    $pixDescription = $gatewayParams['description'];
+    $pixDiscount = str_replace('%', '', $gatewayParams['pixDiscount']);
+
+    if (empty($pixKey)) {
+        showException('Exception', array('Chave Pix não informada. Verificar as configurações do Portal de Pagamento.'));
+    } else {
+        // Calculating pix amount with discount
+        $pixAmount = $gatewayParams['amount'];
+        $total = (float)$pixAmount - ((($pixAmount) * $pixDiscount) / 100);
+        $total = number_format((float)$total, 2, '.', '');
+
+        $document = $gatewayParams['paramsPix']['clientDocumentPix'];
+        $document = preg_replace('/[^0-9]/', '', $document); // Remove non-numeric characters
+
+        $devedorAttribute = 'cpf';
+        if (strlen($document) === 14) {
+            $devedorAttribute = 'cnpj';
+        }
+
+        $requestBody = [
+            'calendario' => [
+                'expiracao' => $pixDays * 86400 // Multiplying by 86400 (1 day seconds) because the API expects to receive a value in seconds
+            ],
+            'devedor' => [
+                $devedorAttribute => $document,
+                'nome' => $gatewayParams['paramsPix']['clientNamePix']
+            ],
+            'valor' => [
+                'original' => strval($total) // String value from amount
+            ],
+            'chave' => $pixKey,
+            "infoAdicionais" => [
+                [
+                    "nome" => "Pagamento em",
+                    "valor" => $gatewayParams['companyname']
+                ],
+                [
+                    "nome" => "Número do Pedido",
+                    "valor" => "#" . $gatewayParams['invoiceid']
+                ]
+            ]
+        ];
+
+        return createImmediateCharge($api_instance, $requestBody);
+    }
+}
+
 
 
 
@@ -194,7 +190,6 @@ function storePixChargeInfo($pix, $gatewayParams)
 
 
     insert('tblgerencianetpix', $info);
-
 }
 
 
@@ -213,7 +208,7 @@ function createGerencianetPixTable()
 
 
 
-    if(!hasTable($tableName)) {
+    if (!hasTable($tableName)) {
 
         $callback = function ($table) {
 
@@ -226,15 +221,12 @@ function createGerencianetPixTable()
             $table->integer('locid');
 
             $table->string('e2eid');
-
         };
 
 
 
         createTable($tableName, $callback);
-
     }
-
 }
 
 
@@ -284,7 +276,6 @@ function createWebhook($api_instance, $gatewayParams)
 
 
     configWebhook($api_instance, $requestParams, $requestBody);
-
 }
 
 
@@ -305,14 +296,14 @@ function createWebhook($api_instance, $gatewayParams)
 
  */
 
-function createQrCode($api_instance, $locId) {
+function createQrCode($api_instance, $locId)
+{
 
     $qrcode = generateQRCode($api_instance, ['id' => $locId]);
 
 
 
     return generateQRCodeTemplate($qrcode);
-
 }
 
 
@@ -335,7 +326,7 @@ function generateQRCodeTemplate($qrcode)
 
 {
 
-    
+
 
     // QR Code image
 
@@ -357,21 +348,21 @@ function generateQRCodeTemplate($qrcode)
 
     $baseUrl = $paramsGateway['systemurl'];
 
-    
+
 
     // Script for Copy action
 
     $script = "<script type=\"text/javascript\" src=\"$baseUrl/modules/gateways/efi/gerencianet_lib/scripts/js/copyQrCode.js\"></script>";
     $scriptStatusPix = "<script type=\"text/javascript\" src=\"$baseUrl/modules/gateways/efi/gerencianet_lib/scripts/js/validation/validationPaymentPix.js\"></script>";
 
-   
 
-    $template = $qrcodeImage.$copyButton.$btnConfirm.$script.$scriptStatusPix;
+
+    $template = $qrcodeImage . $copyButton . $btnConfirm . $script . $scriptStatusPix;
 
     return $template;
-
 }
-function btnConfirm() {
+function btnConfirm()
+{
     return "
     <style>
     #confirmPayment {
@@ -447,12 +438,12 @@ function btnConfirm() {
 
 
 
-    ";      
+    ";
 }
 
-    
 
-    
+
+
 
 
 
@@ -487,9 +478,6 @@ function refundCharge($api_instance, $gatewayParams)
     if (empty($e2eId)) {
 
         showException('Efí Exception', array("Fatura #$invoiceId não possuí pagamentos a serem reembolsados."));
-
-
-
     } else {
 
         $requestParams = [
@@ -513,9 +501,7 @@ function refundCharge($api_instance, $gatewayParams)
         // Requesting Pix Devolution
 
         return devolution($api_instance, $requestParams, $requestBody);
-
     }
-
 }
 /**
  * Gera uma URL com um HMAC.
@@ -525,13 +511,14 @@ function refundCharge($api_instance, $gatewayParams)
  * @return string A URL com o HMAC anexado como parâmetro.
  * @throws InvalidArgumentException Se a URL ou a chave secreta forem inválidas.
  */
-function generateWebhookUrlWithHmac(string $url, string $secret_key): string {
-    
+function generateWebhookUrlWithHmac(string $url, string $secret_key): string
+{
+
     if (!filter_var($url, FILTER_VALIDATE_URL)) {
         throw new InvalidArgumentException('A URL fornecida não é válida.');
     }
 
-    
+
     if (empty($secret_key)) {
         throw new InvalidArgumentException('A chave secreta não pode ser vazia.');
     }
@@ -544,4 +531,3 @@ function generateWebhookUrlWithHmac(string $url, string $secret_key): string {
     $urlWithIgnoreAttr = $urlWithHmac . '&ignorar=';
     return $urlWithIgnoreAttr;
 }
-

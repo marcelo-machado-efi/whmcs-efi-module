@@ -1,0 +1,114 @@
+.slide-button .toggle-button-cover {
+    position: relative;
+    width: 100%;
+    height: 40px;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+}
+
+.slide-button .button-cover {
+    height: 40px;
+    margin-right: 20px;
+    background-color: #fff;
+}
+
+.slide-button .button-cover,
+.slide-button .knobs,
+.slide-button .layer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+.slide-button .button {
+    position: relative;
+    width: 74px;
+    height: 36px;
+    overflow: hidden;
+}
+
+.slide-button .button.r,
+.slide-button .button.r .layer {
+    border-radius: 100px;
+}
+
+.slide-button .checkbox {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 3 !important;
+}
+
+.slide-button .knobs {
+    z-index: 2 !important;
+}
+
+.slide-button .layer {
+    width: 100%;
+    background-color: #fde5cd;
+    -webkit-transition: 0.3s ease all;
+    -o-transition: 0.3s ease all;
+    transition: 0.3s ease all;
+    z-index: 1;
+}
+
+.slide-button .button-10 .knobs:before,
+.slide-button .button-10 .knobs:after,
+.slide-button .button-10 .knobs span {
+    position: absolute;
+    top: 4px;
+    width: 28px;
+    height: 28px;
+    font-size: 10px;
+    font-weight: bold;
+    text-align: center;
+    line-height: 1;
+    padding: 9px 4px;
+    border-radius: 50%;
+    -webkit-transition: 0.3s ease all;
+    -o-transition: 0.3s ease all;
+    transition: 0.3s ease all;
+}
+
+.slide-button .button-10 .knobs:before {
+    content: '';
+    left: 4px;
+    background-color: #f37021;
+}
+
+.slide-button .button-10 .knobs:after {
+    content: 'Não';
+    right: 4px;
+    color: #4e4e4e;
+}
+
+.slide-button .button-10 .knobs span {
+    display: inline-block;
+    left: 4px;
+    color: #fff;
+    z-index: 1 !important;
+}
+
+.slide-button .button-10 .checkbox:checked+.knobs span {
+    color: #4e4e4e;
+}
+
+.slide-button .button-10 .checkbox:checked+.knobs:before {
+    left: 42px;
+    background-color: #F44336;
+}
+
+.slide-button .button-10 .checkbox:checked+.knobs:after {
+    color: #fff;
+}
+
+.slide-button .button-10 .checkbox:checked~.layer {
+    background-color: #fcebeb;
+}

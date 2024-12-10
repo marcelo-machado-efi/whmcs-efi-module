@@ -13,7 +13,7 @@ function get_custom_field_value($field, $clientId)
 
     $customFieldData = selectCob($table, $where, $fields);
     $customFieldId   = $customFieldData["id"];
-    
+
     $table     = "tblcustomfieldsvalues";
     $fields    = "value";
     $where     = array(
@@ -30,17 +30,19 @@ function get_admin_credentials()
 {
     $table    = "tblpaymentgateways";
     $fields    = "*";
-     $where     = array(
+    $where     = array(
         "gateway" => "efí"
     );
 
     $credentials = array();
     $response = selectCob($table, $where, $fields, 8);
-    for($i=0; $i<count($response); $i++){
+    for ($i = 0; $i < count($response); $i++) {
         $name = $response[$i]["setting"];
         $value = $response[$i]["value"];
-        if($name == "clientIdProd" || $name == "clientSecretProd" || $name == "clientIdSandbox" || $name == "numDiasParaVencimento" ||
-            $name == "clientSecretSandbox" || $name == "idConta" ||  $name == "sandbox" || $name == "whmcsAdmin")
+        if (
+            $name == "clientIdProd" || $name == "clientSecretProd" || $name == "clientIdSandbox" || $name == "numDiasParaVencimento" ||
+            $name == "clientSecretSandbox" || $name == "idConta" ||  $name == "sandbox" || $name == "whmcsAdmin"
+        )
             $credentials[$name] = $value;
     }
 
@@ -51,25 +53,23 @@ function extra_amounts_Gerencianet_WHMCS($invoiceId, $descontoBoleto, $discountT
 {
     $total        = get_price($invoiceId);
 
-    if($descontoBoleto == 0) return null;
+    if ($descontoBoleto == 0) return null;
 
     $where    = array('invoiceid' => $invoiceId);
     $order    = selectCob('tblorders', $where, '*');
-    $where    = array('id' => $invoiceId);              
-    $invoice  = selectCob('tblinvoices', $where, '*');     
+    $where    = array('id' => $invoiceId);
+    $invoice  = selectCob('tblinvoices', $where, '*');
     $userid   = $invoice['userid'];
 
-    if ($discountType == '1') 
-    {
-        $discountValue = ($descontoBoleto / 100) * $total; 
-        $amount = number_format(((double)$discountValue*(-1)), 2, '.', '');
+    if ($discountType == '1') {
+        $discountValue = ($descontoBoleto / 100) * $total;
+        $amount = number_format(((float)$discountValue * (-1)), 2, '.', '');
         $discountMsg = $descontoBoleto . '% sobre o valor da cobrança.';
-    }
-    else {
-        $amount = number_format(((double)$descontoBoleto*(-1)), 2, '.', '');
+    } else {
+        $amount = number_format(((float)$descontoBoleto * (-1)), 2, '.', '');
         $discountMsg = 'R$ ' . $descontoBoleto . ',00';
     }
-    
+
     $where           =  array('invoiceid' => $invoiceId);
     $dataInvoiceItem = selectCob('tblinvoiceitems', $where, 'duedate', 1);
     $duedate         = $dataInvoiceItem['duedate'];
@@ -87,47 +87,42 @@ function extra_amounts_Gerencianet_WHMCS($invoiceId, $descontoBoleto, $discountT
 
     insertCob('tblinvoiceitems', $dataDiscount);
 
-    $newOrderAmount      = $order['amount'] + $amount; 
+    $newOrderAmount      = $order['amount'] + $amount;
     $newInvoiceSubTotal  = $invoice['subtotal'] + $amount;
     $newInvoiceTotal     = $invoice['total'] + $amount;
 
-    $updateAmountOrder   = updateCob('tblorders', array('invoiceid' => $invoiceId), array('amount' => $newOrderAmount)); 
+    $updateAmountOrder   = updateCob('tblorders', array('invoiceid' => $invoiceId), array('amount' => $newOrderAmount));
     $updateData          = array('total'    => $newInvoiceTotal, 'subtotal' => $newInvoiceSubTotal);
     $updateAmountInvoice = updateCob('tblinvoices', array('id' => $invoiceId), $updateData);
-
-   
 }
 
-function get_price($invoiceId, $discount=false)
+function get_price($invoiceId, $discount = false)
 {
-   
+
     $invoiceValues['invoiceid'] = $invoiceId;
     $invoiceData                = localAPI("getinvoice", $invoiceValues, $adminuser);
 
     $invoiceItems = $invoiceData['items']['item'];
     $totalItem    = 0;
 
-    foreach ($invoiceItems as $invoiceItem)
-    {
-        if($discount == true)
+    foreach ($invoiceItems as $invoiceItem) {
+        if ($discount == true)
             $totalItem += $invoiceItem['amount'];
-        else
-        {
-            if($invoiceItem['amount'] > 0)
+        else {
+            if ($invoiceItem['amount'] > 0)
                 $totalItem += $invoiceItem['amount'];
         }
     }
     return $totalItem;
 }
 
-function update_invoice_status($invoiceId, $status, $adminWHMCS, $isNewTransaction, $datePaid=null)
-{   
-    if($isNewTransaction == false)
-    {
+function update_invoice_status($invoiceId, $status, $adminWHMCS, $isNewTransaction, $datePaid = null)
+{
+    if ($isNewTransaction == false) {
         $updateInvoiceCommand             = "updateinvoice";
         $updateInvoiceValues["invoiceid"] = (int)$invoiceId;
         $updateInvoiceValues["status"]    = $status;
-        if($datePaid != null)
+        if ($datePaid != null)
             $updateInvoiceValues["datepaid"] = $datePaid;
         $results = localAPI($updateInvoiceCommand, $updateInvoiceValues, $adminWHMCS);
         return $results;
@@ -135,7 +130,8 @@ function update_invoice_status($invoiceId, $status, $adminWHMCS, $isNewTransacti
     return 0;
 }
 
-function buttonGerencianet($errorMessages=null, $link=null, $discount=0, $discountType=null){
+function buttonGerencianet($errorMessages = null, $link = null)
+{
     $src = '<style>
         .botao {
             background-color: #f26522;
@@ -171,30 +167,21 @@ function buttonGerencianet($errorMessages=null, $link=null, $discount=0, $discou
     </script>
     ';
 
-    if($errorMessages != null)
-    {
+    if ($errorMessages != null) {
         $src .= '<form action="modules/gateways/efi/gerencianet_lib/gerencianet_errors.php" method="post">';
         foreach ($errorMessages as $error) {
             $src = $src . '<input type="hidden" name="errors[]" value="' . $error . '"></input>';
         }
         $src .= '<input title="Boleto Efí" target="_blank" type="submit" class="btn botao" value="Visualizar Boleto"></form><br>';
-    }
-    else
-    {
-        if($link == null)
-        {
+    } else {
+        if ($link == null) {
             $src .= "<form action='#' method='post'>
                         <input type='hidden' name='geraCharge' value='true'>
                         <input type='hidden' name='optionPayment' value='billet'>
                         <input type='submit' target='_blank' title='Boleto Efí' value='Visualizar Boleto' class='btn botao'>
                     </form><br>";
-        }
-        else 
-            $src .= '<a title="Boleto Efí" target="_blank" class="btn botao" href="'.$link.'"> Visualizar Boleto</a><br><br>';
-
-        $discount = number_format((double)$discount, 2, '.', '');
-
-   
+        } else
+            $src .= '<a title="Boleto Efí" target="_blank" class="btn botao" href="' . $link . '"> Visualizar Boleto</a><br><br>';
     }
 
     return $src;
@@ -203,26 +190,24 @@ function buttonGerencianet($errorMessages=null, $link=null, $discount=0, $discou
 function send_errors($errorMessages)
 {
     $url = 'modules/gateways/efi/gerencianet_lib/gerencianet_errors.php';
-    
+
     $code = "<script>
     var form = document.createElement('form');
     form.method = 'post';
-    form.action = '" . $url ."';";
+    form.action = '" . $url . "';";
     foreach ($errorMessages as $error) {
-        $code = $code . 
-        "var input = document.createElement('input');
+        $code = $code .
+            "var input = document.createElement('input');
         input.type = 'text';
         input.name = 'errors[]';
-        input.value = '" . $error ."';
+        input.value = '" . $error . "';
         form.appendChild(input);";
     }
-    
+
     $code = $code .
-    "document.body.appendChild(form);
+        "document.body.appendChild(form);
     form.submit();
     </script>";
 
     return $code;
 }
-
-?>

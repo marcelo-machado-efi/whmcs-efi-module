@@ -1,0 +1,19 @@
+{
+    "name": "efi/whmcs-payment-gateway",
+    "description": "Gateway de pagamento integrado com o sistema WHMCS",
+    "type": "library",
+    "require": {
+        "php": ">=8.1",
+        "efipay/sdk-php-apis-efi": "^1"
+    },
+    "autoload": {
+        "psr-4": {
+            "PaymentGateway\\": "gerencianet_lib/src/PaymentGateway"
+        }
+    },
+    "authors": [{
+        "name": "Marcelo Machado",
+        "email": "marcelo.machado@sejaefi.com.gbr"
+    }],
+    "license": "MIT"
+}

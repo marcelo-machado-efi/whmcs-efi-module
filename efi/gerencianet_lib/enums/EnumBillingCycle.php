@@ -16,5 +16,4 @@ enum DomainRegistrationPeriod: string
     case ONE_YEAR = '1 Year';
     case TWO_YEARS = '2 Years';
     case THREE_YEARS = '3 Years';
-    
 }

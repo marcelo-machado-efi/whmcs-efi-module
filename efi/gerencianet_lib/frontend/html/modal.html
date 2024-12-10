@@ -1,0 +1,485 @@
+<head>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link href='modules/gateways/efi/gerencianet_lib/frontend/assets/css/libs/font-awesome.min.css' rel='stylesheet'>
+    <script type='text/javascript' src='modules/gateways/efi/gerencianet_lib/frontend/js/libs/jquery/jquery.min.js'></script>
+    <link rel="stylesheet" href="modules/gateways/efi/gerencianet_lib/frontend/assets/css/libs/bootstrap.min.css" id="stylePaymentMehtodEfi" disabled>
+    <link rel="stylesheet" href="modules/gateways/efi/gerencianet_lib/frontend/assets/css/components/radioButton/style.css">
+    <link rel="stylesheet" href="modules/gateways/efi/gerencianet_lib/frontend/assets/css/components/modal/style.css">
+</head>
+
+<div class="optionPaymentEfi d-none" id="bg-div">
+    <div class="row justify-content-center w-75 mx-lg-auto">
+        <div class="col-lg-10 col-md-11 col-12">
+            <div class="card card0">
+                <div class="d-flex" id="wrapper">
+                    <!-- Sidebar -->
+                    <div class="bg-light border-right" id="sidebar-wrapper">
+                        <div class="sidebar-heading  p-5 d-flex align-content-center justify-content-center "><img src="modules/gateways/efi/gerencianet_lib/frontend/assets/imgs/efi.png" class=" img-fluid  " style="width: 200px;" alt=""></div>
+                        <div class="list-group list-group-flush">
+                            <a data-toggle="tab" href="#billet" id="tab1" class="tabs  list-group-item  bg-light  ">
+                                <div class="list-div my-2 d-flex align-items-center gap-options-side-bar">
+                                    <div class="fa fa-barcode "></div> Boleto Bancário
+                                </div>
+                            </a>
+                            <a data-toggle="tab" href="#creditCard" id="tab2" class="tabs list-group-item bg-light ">
+                                <div class="list-div my-2 d-flex align-items-center gap-options-side-bar">
+                                    <div class="fa fa-credit-card"></div> Cartão de crédito
+                                </div>
+                            </a>
+                            <a data-toggle="tab" href="#pix" id="tab3" class="tabs list-group-item bg-light">
+                                <div class="list-div my-2 d-flex align-items-center gap-options-side-bar">
+                                    <img class=" fa fa-fw " src="modules/gateways/efi/gerencianet_lib/frontend/assets/imgs/pix.png" alt=""> Pix
+                                </div>
+                            </a>
+                            <a data-toggle="tab" href="#openFinance" id="tab4" class="tabs list-group-item bg-light">
+                                <div class="list-div my-2 d-flex align-items-center gap-options-side-bar">
+                                    <img class="fa fa-fw  " src="modules/gateways/efi/gerencianet_lib/frontend/assets/imgs/openfinance.svg " alt="" srcset=""> Open Finance
+                                </div>
+                            </a>
+
+                        </div>
+                    </div>
+                    <!-- Page Content -->
+                    <div id="page-content-wrapper">
+                        <div class="row " id="border-btm">
+                            <div class="col-4"> <button class="btn  mt-4 ml-lg-3 mb-3 d-md-none" id="menu-toggle">
+                                    <div class="bar4"></div>
+                                    <div class="bar4"></div>
+                                    <div class="bar4"></div>
+                                </button> </div>
+                            <div class="col-8">
+
+                                <div class="row justify-content-right ">
+                                    <div class="col-12  ">
+                                        <div class="row justify-content-right text-right mt-4  mr-3">
+                                            <p class="mb-0 col-12 p-0  text-right"><i class="fa fa-2x   fechar fa-arrow-left" style="color: #f37021; cursor: pointer;"></i> </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row justify-content-center">
+                            <div class="text-center h5" id="descriptionPayment">Boleto Bancário </div>
+                        </div>
+
+                        <!-- BILLET -->
+                        <div class="tab-content tab-content-max-width">
+                            <div id="billet" class="tab-pane ">
+                                <div class="row justify-content-center">
+                                    <div class="col-11">
+                                        <div class="form-card">
+                                            <h5 class="mt-0 mb-4 text-center">Ao optar pelo pagamento via boleto bancário, a confirmação ocorrerá até o próximo dia útil após a realização do pagamento.</h5>
+                                            <form id="testeBillet" action='#' method='POST' enctype='multipart/form-data'>
+                                                <input type="hidden" name="paymentType" value="billet">
+                                                <section class="ftco-section row" id="buttons">
+                                                    <div class="container">
+                                                        <div class="slide-button">
+                                                            <div class="toggle-button-cover">
+                                                                <div class="button-cover d-flex align-items-center">
+                                                                    <div class="button r button-10">
+                                                                        <input type="checkbox" class="checkbox" id="auto-complete-billet">
+                                                                        <div class="knobs">
+                                                                            <span>Sim</span>
+                                                                        </div>
+                                                                        <div class="layer"></div>
+                                                                    </div>
+                                                                    <div class="ml-2"><span class="ios-switch-control-description">Utilizar dados do cadastro</span></div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="toggle-button-cover">
+                                                                <div class="button-cover d-flex align-items-center">
+                                                                    <div class="button r button-10">
+                                                                        <input type="checkbox" class="checkbox" name="subscriptionBillet">
+                                                                        <div class="knobs">
+                                                                            <span>Sim</span>
+                                                                        </div>
+                                                                        <div class="layer"></div>
+                                                                    </div>
+                                                                    <div class="ml-2"><span class="ios-switch-control-description">Ativar recorrência <i class="fas fa-question-circle" style="color: #f37021 !important;" data-toggle="tooltip " data-placement="top" title="Ao ativar essa opção, toda nova fatura utilizara o boleto como forma de pagamento"></i></span></div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </section>
+                                                <div class="row">
+                                                    <div class="col-12 col-md-6">
+                                                        <div class="input-group required"> <input name="clientName" type="text" id="nameBillet" placeholder="" required> <label>*Nome/Razão Social</label> </div>
+                                                    </div>
+                                                    <div class="col-12 col-md-6">
+                                                        <div class="input-group"> <input type="text" name="clientDocumentBillet" data-validation="document" data-mask="cpf-cnpj" id="documentClientBillet" placeholder="" required> <label>*CPF/CNPJ</label> </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-12 col-md-6">
+                                                        <div class="input-group"> <input type="text" name="clientEmail" data-validation="email" id="clientEmailBillet" placeholder="" required> <label>*E-mail</label> </div>
+                                                    </div>
+                                                    <div class="col-12 col-md-6">
+                                                        <div class="input-group"> <input type="text" name="clientTelephoneBillet" data-validation="validateTelephone" id="telephoneBillet" data-mask="phone" placeholder="" class="placeicon"> <label>Telefone</label> </div>
+                                                    </div>
+                                                </div>
+
+                                                <div id="totalBillet" class="row mb-2" style="margin-top: auto;">
+                                                    <div class="  col-12  ">
+                                                        <div class=" d-flex justify-content-between border rounded  p-2">
+                                                            <span id="spanTotal" class="font-weight-bold">Valor da compra:</span>
+                                                            <span id="spanValorTotal" class="font-weight-bold"></span>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="  col-12 d-none ">
+                                                        <div class=" d-flex justify-content-between border   p-2">
+                                                            <span id="spanTotal" class="font-weight-bold">Desconto:</span>
+                                                            <span id="spanDesconto" class="font-weight-bold"></span>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="  col-12  ">
+                                                        <div class=" d-flex justify-content-between border border-top-0 p-2">
+                                                            <span id="spanTotal" class="font-weight-bold">Total:</span>
+                                                            <span id="spanValorFinal" class="font-weight-bold"></span>
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+                                                <div class="row ">
+                                                    <div class="col-md-12"> <input type="submit" value="Gerar Boleto" class="btn   placeicon"> </div>
+                                                </div>
+
+
+                                            </form>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <!-- CARD -->
+                            <div id="creditCard" class="tab-pane  ">
+                                <div class="row justify-content-center">
+                                    <div class="col-11">
+                                        <div class="form-card">
+                                            <h3 class="mt-0 mb-4 text-center">Dados do titular do cartão</h3>
+                                            <form id="cardForm" action='#' method='POST' enctype='multipart/form-data' onsubmit="event.preventDefault()">
+                                                <input type="hidden" name="paymentType" value="creditCard">
+                                                <section class="ftco-section row" id="buttons">
+                                                    <div class="container">
+                                                        <div class="slide-button">
+                                                            <div class="toggle-button-cover">
+                                                                <div class="button-cover d-flex align-items-center">
+                                                                    <div class="button r button-10">
+                                                                        <input type="checkbox" class="checkbox" id="auto-complete-card">
+                                                                        <div class="knobs">
+                                                                            <span>Sim</span>
+                                                                        </div>
+                                                                        <div class="layer"></div>
+                                                                    </div>
+                                                                    <div class="ml-2"><span class="ios-switch-control-description">Utilizar dados do cadastro</span></div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="toggle-button-cover">
+                                                                <div class="button-cover d-flex align-items-center">
+                                                                    <div class="button r button-10">
+                                                                        <input type="checkbox" class="checkbox" name="subscriptionCard">
+                                                                        <div class="knobs">
+                                                                            <span>Sim</span>
+                                                                        </div>
+                                                                        <div class="layer"></div>
+                                                                    </div>
+                                                                    <div class="ml-2"><span class="ios-switch-control-description">Ativar recorrência <i class="fas fa-question-circle" data-toggle="tooltip " style="color: #f37021 !important;" data-placement="top" title="Ao ativar essa opção, toda nova fatura utilizara o cartão de crédito como forma de pagamento"></i></span></div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </section>
+                                                <div class="row">
+                                                    <div class="col-12 col-md-6">
+                                                        <div class="input-group  "> <input class="form-control " name="clientNameCredit" type="text" id="nameCredit" placeholder="" required> <label>*Nome/Razão Social</label> </div>
+                                                    </div>
+                                                    <div class="col-12 col-md-6">
+                                                        <div class="input-group"> <input type="text" name="clientEmailCredit" data-validation="email" id="clientEmailCredit" placeholder="" required> <label>*E-mail</label> </div>
+                                                    </div>
+
+
+                                                    <div class="col-12 col-md-4">
+                                                        <div class="input-group"> <input type="text" name="clientDocumentCredit" data-validation="document" data-mask="cpf-cnpj" id="documentClientCredit" placeholder="" required> <label>*CPF/CNPJ</label> </div>
+                                                    </div>
+                                                    <div class="col-12 col-md-4">
+                                                        <div class="input-group"> <input type="text" name="clientTelephoneCredit" id="telephoneCredit" data-validation="validateTelephone" placeholder="" data-mask="phone" class="placeicon" required> <label>*Telefone</label> </div>
+                                                    </div>
+
+                                                    <div class="col-12 col-md-4">
+                                                        <div class="input-group"> <input type="date" name="dataNasce" id="dataNasce" placeholder="" data-validation="date" required> <label>*Data de Nascimento</label> </div>
+                                                    </div>
+
+                                                    <div class="col-12 col-md-6">
+                                                        <div class="input-group"> <input type="text" name="rua" id="rua" placeholder="" class="placeicon" required> <label>*Rua</label> </div>
+                                                    </div>
+                                                    <div class="col-12 col-md-2">
+                                                        <div class="input-group"> <input type="text" name="numero" id="numero" placeholder="" class="placeicon" required> <label>*N°</label> </div>
+                                                    </div>
+                                                    <div class="col-12 col-md-4">
+                                                        <div class="input-group"> <input type="text" name="bairro" id="bairro" placeholder="" class="placeicon" required> <label>*Bairro</label> </div>
+                                                    </div>
+
+                                                    <div class="col-12 col-md-6">
+                                                        <div class="input-group"> <input type="text" name="cidade" id="cidade" placeholder="" class="placeicon" required> <label>*Cidade</label> </div>
+                                                    </div>
+                                                    <div class="col-12 col-md-3">
+                                                        <div class="input-group"> <input type="text" name="cep" id="cep" placeholder="" data-validation="cep" data-mask="cep" class="placeicon" required> <label>*CEP</label> </div>
+                                                    </div>
+                                                    <div class="col-12 col-md-3">
+                                                        <div class="input-group">
+                                                            <select class="custom-select" name="estado" id="estado" style="margin-bottom: 25px;" required>
+                                                                    <option value="" >Estado...</option>
+                                                                    <option value="AC">Acre</option>
+                                                                    <option value="AL">Alagoas</option>
+                                                                    <option value="AP">Amapá</option>
+                                                                    <option value="AM">Amazonas</option>
+                                                                    <option value="BA">Bahia</option>
+                                                                    <option value="CE">Ceará</option>
+                                                                    <option value="DF">Distrito Federal</option>
+                                                                    <option value="ES">Espírito Santo</option>
+                                                                    <option value="GO">Goiás</option>
+                                                                    <option value="MA">Maranhão</option>
+                                                                    <option value="MT">Mato Grosso</option>
+                                                                    <option value="MS">Mato Grosso do Sul</option>
+                                                                    <option value="MG">Minas Gerais</option>
+                                                                    <option value="PA">Pará</option>
+                                                                    <option value="PB">Paraíba</option>
+                                                                    <option value="PR">Paraná</option>
+                                                                    <option value="PE">Pernambuco</option>
+                                                                    <option value="PI">Piauí</option>
+                                                                    <option value="RJ">Rio de Janeiro</option>
+                                                                    <option value="RN">Rio Grande do Norte</option>
+                                                                    <option value="RS">Rio Grande do Sul</option>
+                                                                    <option value="RO">Rondônia</option>
+                                                                    <option value="RR">Roraima</option>
+                                                                    <option value="SC">Santa Catarina</option>
+                                                                    <option value="SP">São Paulo</option>
+                                                                    <option value="SE">Sergipe</option>
+                                                                    <option value="TO">Tocantins</option>
+                                                              </select> </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <div class="input-group"> <input type="text" name="numCartao" id="numCartao" data-validation="watcherInstallments" data-mask="credit-card" placeholder="0000 0000 0000 0000" required> <label>NÚMERO DO CARTÃO</label> </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-6 col-12">
+                                                        <div class="input-group"> <input type="text" name="vencimentoCartao" id="vencimentoCartao" data-mask="expiry-date" placeholder="MM/YY" minlength="5" maxlength="5" required> <label>DATA DE VENCIEMNTO</label> </div>
+                                                    </div>
+                                                    <div class="col-md-6 col-12">
+                                                        <div class="input-group"> <input type="password" data-mask="cvv" name="codSeguranca" id="codSeguranca" placeholder="&#9679;&#9679;&#9679;" class="placeicon" minlength="3" maxlength="3" required> <label>CVV</label> </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-12 ">
+                                                        <div class="input-group">
+                                                            <select class="custom-select" name="numParcelas" id="numParcelas" style="margin-bottom: 25px;" required>
+                                                                    <option value="" >Insira os dados do seu cartão...</option>
+                                                                   
+                                                                    
+                                                              </select> </div>
+                                                    </div>
+                                                </div>
+                                                <div id="totalCard" class="row mb-2" style="margin-top: auto;">
+                                                    <div class="  col-12  ">
+                                                        <div class=" d-flex justify-content-between border rounded  p-2">
+                                                            <span id="spanTotal" class="font-weight-bold">Valor da compra:</span>
+                                                            <span id="spanValorTotal" class="font-weight-bold"></span>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="  col-12  ">
+                                                        <div class=" d-flex justify-content-between border border-top-0 p-2">
+                                                            <span id="spanTotal" class="font-weight-bold">Total:</span>
+                                                            <span id="spanValorFinal" class="font-weight-bold"></span>
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-12"> <input type="submit" value="Pagar" class="btn    placeicon"> </div>
+                                                </div>
+                                                <input type="hidden" name="payment_token">
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- PIX -->
+                            <div id="pix" class="tab-pane">
+                                <div class="row justify-content-center">
+                                    <div class="col-11">
+                                        <div class="form-card">
+                                            <h5 class="mt-0 mb-4 text-center">Optando por pagar via Pix, o pagamento é processado e a confirmação ocorrerá em alguns segundos.</h5>
+                                            <form action='#' method='POST' enctype='multipart/form-data'>
+                                                <input type="hidden" name="paymentType" value="pix">
+                                                <section class="ftco-section row" id="buttons">
+                                                    <div class="container">
+                                                        <div class="slide-button">
+                                                            <div class="toggle-button-cover">
+                                                                <div class="button-cover d-flex align-items-center">
+                                                                    <div class="button r button-10">
+                                                                        <input type="checkbox" class="checkbox" id="auto-complete-pix">
+                                                                        <div class="knobs">
+                                                                            <span>Sim</span>
+                                                                        </div>
+                                                                        <div class="layer"></div>
+                                                                    </div>
+                                                                    <div class="ml-2"><span class="ios-switch-control-description">Utilizar dados do cadastro</span></div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="toggle-button-cover">
+                                                                <div class="button-cover d-flex align-items-center">
+                                                                    <div class="button r button-10">
+                                                                        <input type="checkbox" class="checkbox" name="subscriptionPix">
+                                                                        <div class="knobs">
+                                                                            <span>Sim</span>
+                                                                        </div>
+                                                                        <div class="layer"></div>
+                                                                    </div>
+                                                                    <div class="ml-2"><span class="ios-switch-control-description">Ativar recorrência <i class="fas fa-question-circle" data-toggle="tooltip " style="color: #f37021 !important;" data-placement="top" title="Ao ativar essa opção, toda nova fatura utilizara o pix como forma de pagamento"></i></span></div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </section>
+                                                <div class="row">
+                                                    <div class="col-12 col-md-6">
+                                                        <div class="input-group required"> <input name="clientNamePix" id="clientNamePix" type="text" placeholder="" required> <label>*Nome/Razão Social</label> </div>
+                                                    </div>
+                                                    <div class="col-12 col-md-6">
+                                                        <div class="input-group"> <input name="clientDocumentPix" id="documentClientPix" data-validation="document" type="text" data-mask="cpf-cnpj" placeholder="" required> <label>*CPF/CNPJ</label> </div>
+                                                    </div>
+                                                </div>
+                                                <div id="totalPix" class="row mb-2" style="margin-top: auto;">
+                                                    <div class="  col-12  ">
+                                                        <div class=" d-flex justify-content-between border rounded  p-2">
+                                                            <span id="spanTotal" class="font-weight-bold">Valor da compra:</span>
+                                                            <span id="spanValorTotal" class="font-weight-bold"></span>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="  col-12 d-none ">
+                                                        <div class=" d-flex justify-content-between border   p-2">
+                                                            <span id="spanTotal" class="font-weight-bold">Desconto:</span>
+                                                            <span id="spanDesconto" class="font-weight-bold"></span>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="  col-12  ">
+                                                        <div class=" d-flex justify-content-between border border-top-0 p-2">
+                                                            <span id="spanTotal" class="font-weight-bold">Total:</span>
+                                                            <span id="spanValorFinal" class="font-weight-bold"></span>
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-12"> <input type="submit" value="Gerar QRCode" class="btn    placeicon"> </div>
+                                                </div>
+
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="openFinance" class="tab-pane">
+                                <div class="row justify-content-center">
+                                    <div class="col-11">
+                                        <div class="form-card">
+                                            <h5 class="mt-0 mb-4 text-center">Realize seu pagamento pelo banco escolhido e receba a confirmação em segundos.</h5>
+                                            <form action='#' method='POST' enctype='multipart/form-data'>
+                                                <input type="hidden" name="paymentType" value="openFinance">
+                                                <section class="ftco-section row" id="buttons">
+                                                    <div class="container">
+                                                        <div class="slide-button">
+                                                            <div class="toggle-button-cover">
+                                                                <div class="button-cover d-flex align-items-center">
+                                                                    <div class="button r button-10">
+                                                                        <input type="checkbox" class="checkbox" id="auto-complete-OF">
+                                                                        <div class="knobs">
+                                                                            <span>Sim</span>
+                                                                        </div>
+                                                                        <div class="layer"></div>
+                                                                    </div>
+                                                                    <div class="ml-2"><span class="ios-switch-control-description">Utilizar dados do cadastro</span></div>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </section>
+                                                <div class="row">
+
+                                                    <div class="col-12 col-md-6">
+                                                        <div class="input-group"> <input name="favoredDocumentOF" id="documentClientOF" data-validation="document" type="text" data-mask="cpf-cnpj" placeholder="" required> <label>*CPF</label> </div>
+                                                    </div>
+                                                    <div class="col-12 col-md-6 ">
+                                                        <div class="input-group"> <input name="favoredPJDocumentOF" id="documentPJClientOF" data-validation="document" type="text" data-mask="cpf-cnpj" placeholder=""> <label>CNPJ</label> </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-12 ">
+                                                        <div class="input-group">
+                                                            <select class="custom-select" name="favoredbankOF" id="bankOF" style="margin-bottom: 25px;" required>
+                                                                    <option value="" >Banco para Pagamento...</option>
+                                                                   
+                                                              </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div id="totalOF" class="row mb-2" style="margin-top: auto;">
+                                                    <div class="  col-12  ">
+                                                        <div class=" d-flex justify-content-between border rounded  p-2">
+                                                            <span id="spanTotal" class="font-weight-bold">Valor da compra:</span>
+                                                            <span id="spanValorTotal" class="font-weight-bold"></span>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="  col-12 d-none ">
+                                                        <div class=" d-flex justify-content-between border   p-2">
+                                                            <span id="spanTotal" class="font-weight-bold">Desconto:</span>
+                                                            <span id="spanDesconto" class="font-weight-bold"></span>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="  col-12  ">
+                                                        <div class=" d-flex justify-content-between border border-top-0 p-2">
+                                                            <span id="spanTotal" class="font-weight-bold">Total:</span>
+                                                            <span id="spanValorFinal" class="font-weight-bold"></span>
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-12"> <input type="submit" value="Pagar" class="btn    placeicon"> </div>
+                                                </div>
+
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type='text/javascript' src='modules/gateways/efi/gerencianet_lib/frontend/js/libs/bootstrap/bootstrap.min.js'></script>
+
+    <script type="module" src="modules/gateways/efi/gerencianet_lib/frontend/js/script.mjs"></script>
+</div>

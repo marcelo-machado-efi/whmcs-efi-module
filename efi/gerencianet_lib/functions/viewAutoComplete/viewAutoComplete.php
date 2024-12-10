@@ -4,9 +4,9 @@ function generateAutoCompleteTotal($gatewayParams)
     $total = floatval($gatewayParams['amount']);
     $tipoDescontoBoleto = $gatewayParams['tipoDesconto'];
     $descontoBoleto = floatval($gatewayParams['descontoBoleto']);
-    $descontoPix = floatval($gatewayParams['pixDiscount']); 
+    $descontoPix = floatval($gatewayParams['pixDiscount']);
     $totalDescontoPix = ($descontoPix * $total) / 100;
-    $totalDescontoBoleto = ($tipoDescontoBoleto == '1')?(($total * $descontoBoleto)/100):$descontoBoleto;
+    $totalDescontoBoleto = ($tipoDescontoBoleto == '1') ? (($total * $descontoBoleto) / 100) : $descontoBoleto;
     $creditOption = $gatewayParams['activeCredit'] == "on";
     $pixOption = $gatewayParams['activePix'] == "on";
     $boletoOption = $gatewayParams['activeBoleto'] == "on";
@@ -38,8 +38,8 @@ function generateAutoCompleteTotal($gatewayParams)
             input = $(\"<input />\", {
                 value:'$creditOption' ,
                 type: 'hidden',
-                name: 'ativarCredito',
-                class: 'ativarCredito'
+                name: 'creditOption',
+                class: 'creditOption'
             });
             $(document.body).append(input);
             input = $(\"<input />\", {
