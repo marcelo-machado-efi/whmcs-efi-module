@@ -2,8 +2,8 @@
     "APIs": {
         "CHARGES": {
             "URL": {
-                "production": "https://api.gerencianet.com.br",
-                "sandbox": "https://sandbox.gerencianet.com.br"
+                "production": "https://cobrancas.api.efipay.com.br",
+                "sandbox": "https://cobrancas-h.api.efipay.com.br"
             },
             "ENDPOINTS": {
                 "authorize": {
@@ -186,8 +186,8 @@
         },
         "PIX": {
             "URL": {
-                "production": "https://api-pix.gerencianet.com.br",
-                "sandbox": "https://api-pix-h.gerencianet.com.br"
+                "production": "https://pix.api.efipay.com.br",
+                "sandbox": "https://pix-h.api.efipay.com.br"
             },
             "ENDPOINTS": {
                 "authorize": {
@@ -366,8 +366,8 @@
         },
         "OPEN-FINANCE": {
             "URL": {
-                "production": "https://apis.gerencianet.com.br",
-                "sandbox": "https://apis-h.gerencianet.com.br"
+                "production": "https://openfinance.api.efipay.com.br",
+                "sandbox": "https://openfinance-h.api.efipay.com.br"
             },
             "ENDPOINTS": {
                 "authorize": {
