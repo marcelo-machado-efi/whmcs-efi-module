@@ -5,7 +5,7 @@ namespace PaymentGateway\Methods\Boleto;
 use PaymentGateway\DTOs\Client\ClientDTO;
 use PaymentGateway\Methods\Base\Charges;
 use PaymentGateway\Methods\Boleto\Item;
-
+use PaymentGateway\Methods\Interfaces\Metadata;
 
 /**
  * Class BankingBillet

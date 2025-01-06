@@ -24,7 +24,7 @@ class ConfigAPIDTO
         $this->debug = ($gatewayParams['debug'] == 'on');
         $this->mtls = ($gatewayParams['mtls'] == 'on');
         $this->timeout = 60;
-        $this->version = 2.3;
+        $this->version = 2.4;
     }
     public function getApiConfig(): array
     {

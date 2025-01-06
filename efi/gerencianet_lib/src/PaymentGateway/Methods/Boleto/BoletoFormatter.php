@@ -3,6 +3,7 @@
 namespace PaymentGateway\Methods\Boleto;
 
 use PaymentGateway\Logging\TransactionLogger;
+use PaymentGateway\Methods\Interfaces\Metadata;
 
 class BoletoFormatter
 {

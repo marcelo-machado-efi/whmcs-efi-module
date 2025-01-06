@@ -1,31 +1,36 @@
 <?php
 
-namespace PaymentGateway\Methods\Boleto;
+namespace PaymentGateway\Methods\CreditCard;
 
 use PaymentGateway\DTOs\Client\ClientDTO;
 use PaymentGateway\Logging\TransactionLogger;
 use PaymentGateway\Models\Invoice\InvoiceItem;
-use DateInterval;
-use DateTime;
+use PaymentGateway\Methods\Boleto\ItemManager;
+use PaymentGateway\Methods\Interfaces\Metadata;
 use PaymentGateway\Methods\CreditCard\CreditCardBody;
+use PaymentGateway\Methods\CreditCard\CreditCardFormatter;
+use PaymentGateway\Methods\CreditCard\PaymentToken;
 
-class BoletoConfig
+class CreditCardConfig
 {
     private CreditCardBody $payment;
     private ItemManager $itemManager;
-    private BoletoFormatter $formatter;
+    private CreditCardFormatter $formatter;
     private array $orderAttributes;
 
     public function __construct($orderAttributes)
     {
         $this->payment = new CreditCardBody();
         $this->itemManager = new ItemManager();
-        $this->formatter = new BoletoFormatter();
-        $this->orderAttributes = $orderAttributes;
-        $this->setMessage($orderAttributes['message']);
-        $this->setEnviarEmailParaClienteFinal($orderAttributes['sendEmailGN'] == 'on');
+        $this->formatter = new CreditCardFormatter();
+        // $this->orderAttributes = $orderAttributes;
+        $this->setInstallments($orderAttributes["paramsCartao"]["numParcelas"]);
     }
 
+    private function setInstallments(int $installments): void
+    {
+        $this->payment->setInstallments($installments);
+    }
     /**
      * Adiciona itens ao boleto.
      *
@@ -48,51 +53,19 @@ class BoletoConfig
         return $this;
     }
 
-    public function setExpireAt(string $expireAt): self
-    {
-        $numDiasParaVencimento = $this->orderAttributes['numDiasParaVencimento'];
-        if ($numDiasParaVencimento == null || $numDiasParaVencimento == '')  $numDiasParaVencimento = '0';
-
-        $date = DateTime::createFromFormat('Y-m-d', $expireAt);
-
-        $date->add(new DateInterval('P' . (string)$numDiasParaVencimento . 'D'));
-        $dueDateBillet = (string)$date->format('Y-m-d');
-
-        $this->payment->setExpireAt($dueDateBillet);
-        return $this;
-    }
-
-    public function setDiscount(Discount $discount): self
-    {
-
-
-        $this->payment->setDiscount($discount);
-        return $this;
-    }
-
-    public function setConfiguration(Configuration $configuration): self
-    {
-        $this->payment->setConfiguration($configuration);
-        return $this;
-    }
-
-    public function setMessage(string $message): self
-    {
-        $this->payment->setMessage($message);
-        return $this;
-    }
-
     public function setCustomer(ClientDTO $customer): self
     {
         $this->payment->setCustomer($customer);
         return $this;
     }
 
-    public function setEnviarEmailParaClienteFinal(bool $enviarEmailParaClienteFinal): self
+    public function setPaymentToken(PaymentToken $paymentToken): self
     {
-        $this->payment->setEnviarEmailParaClienteFinal($enviarEmailParaClienteFinal);
+        $this->payment->setPaymentToken($paymentToken);
         return $this;
     }
+
+
 
     /**
      * Retorna a configuração do boleto formatada como um array.

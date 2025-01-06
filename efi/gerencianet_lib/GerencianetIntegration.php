@@ -46,7 +46,7 @@ class GerencianetIntegration
 			);
 		}
 		$gn_credentials_options['headers'] = [
-			'efi-whmcs-version'=> '2.3'
+			'efi-whmcs-version' => '2.4'
 		];
 		return $gn_credentials_options;
 	}
@@ -271,7 +271,7 @@ class GerencianetIntegration
 			return GerencianetIntegration::result_api($errorResponse, false);
 		}
 	}
-	public function pay_credit($charge_id, $customer, $message, $params, $discountValue )
+	public function pay_credit($charge_id, $customer, $message, $params, $discountValue)
 	{
 		$invoiceValues['invoiceid'] = $params['invoiceid'];
 		$invoiceData     = localAPI("getinvoice", $invoiceValues, $params['whmcsAdmin']);

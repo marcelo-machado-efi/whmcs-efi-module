@@ -7,6 +7,7 @@ use PaymentGateway\Logging\TransactionLogger;
 use PaymentGateway\Models\Invoice\InvoiceItem;
 use DateInterval;
 use DateTime;
+use PaymentGateway\Methods\Interfaces\Metadata;
 
 class BoletoConfig
 {

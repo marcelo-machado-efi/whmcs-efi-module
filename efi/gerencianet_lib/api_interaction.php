@@ -8,7 +8,8 @@ use Gerencianet\Exception\GerencianetException;
  * Generates an random prefix to compose a unique ID for
  * open finance idempotency key.
  */
-function uniqidReal($lenght = 30) {
+function uniqidReal($lenght = 30)
+{
     if (function_exists("random_bytes")) {
         $bytes = random_bytes(ceil($lenght / 2));
     } elseif (function_exists("openssl_random_pseudo_bytes")) {
@@ -54,7 +55,7 @@ function getGerencianetApiInstance($gatewayParams)
             'headers' => [
                 'x-skip-mtls-checking' => $mtls ? 'false' : 'true', // Needs to be string
                 'x-idempotency-key' => uniqid(uniqidReal(), true), // For open finance usage
-                'efi-whmcs-version'=> '2.3'
+                'efi-whmcs-version' => '2.4'
             ]
         )
     );
@@ -77,10 +78,8 @@ function createImmediateCharge($api_instance, $requestBody)
         $responseData = $api_instance->pixCreateImmediateCharge([], $requestBody);
 
         return $responseData;
-
     } catch (GerencianetException $e) {
         showException('Gerencianet Exception', array($e));
-
     } catch (Exception $e) {
         showException('Exception', array($e));
     }
@@ -97,9 +96,8 @@ function configWebhook($api_instance, $requestParams, $requestBody)
 {
     try {
         $api_instance->pixConfigWebhook($requestParams, $requestBody);
-
     } catch (GerencianetException $e) {
-        throw new \Exception("<strong>Falha ao cadastrar webhook:<br></strong>" . $e); 
+        throw new \Exception("<strong>Falha ao cadastrar webhook:<br></strong>" . $e);
     } catch (Exception $e) {
         throw new \Exception("<strong>Falha ao cadastrar webhook:<br></strong>" . $e);
     }
@@ -119,10 +117,8 @@ function generateQRCode($api_instance, $requestParams)
         $qrcode = $api_instance->pixGenerateQRCode($requestParams);
 
         return $qrcode;
-
     } catch (GerencianetException $e) {
         showException('Efí Exception', array($e));
-
     } catch (Exception $e) {
         showException('Exception', array($e));
     }
@@ -143,10 +139,8 @@ function devolution($api_instance, $requestParams, $requestBody)
         $responseData = $api_instance->pixDevolution($requestParams, $requestBody);
 
         return $responseData;
-
     } catch (GerencianetException $e) {
         showException('Efí Exception', array($e));
-
     } catch (Exception $e) {
         showException('Exception', array($e));
     }

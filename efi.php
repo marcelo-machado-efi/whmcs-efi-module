@@ -471,7 +471,7 @@ function efi_config()
             'FriendlyName' => '',
             'Description' => '<div class="card text-center">
             <div class="card-header mb-4 ">
-              <h1 class="text-color-efi">Plugin Efí v2.3</h1>
+              <h1 class="text-color-efi">Plugin Efí v2.4</h1>
             </div>
             <div class="card-body">
               <p class="card-text">Esta versão inclui atualizações importantes para o funcionamento com a versão 8.9 do WHMCS.</p>
@@ -699,18 +699,7 @@ function efi_link($gatewayParams)
 
 
 
-    $gnIntegration = new GerencianetIntegration($gatewayParams['clientIdProd'], $gatewayParams['clientSecretProd'], $gatewayParams['clientIdSandbox'], $gatewayParams['clientSecretSandbox'], $gatewayParams['sandbox'], $gatewayParams['idConta']);
 
-    $existingChargeConfirm = existingChargeCredit($gatewayParams, $gnIntegration);
-
-    $existingCharge = $existingChargeConfirm['existCharge'];
-
-    $code = $existingChargeConfirm['code'];
-
-    if ($existingCharge) {
-
-        return $code;
-    }
 
 
 
@@ -733,7 +722,7 @@ function efi_link($gatewayParams)
                 break;
 
             case 'creditCard':
-                return definedCreditCardPayment($gatewayParams);
+                return definedCreditCardPayment($gatewayParams, $paymentOptionsScript);
                 break;
 
             case 'openFinance':
@@ -897,35 +886,20 @@ function definedBilletPayment($gatewayParams)
 
 
 
-function definedCreditCardPayment($gatewayParams)
+function definedCreditCardPayment($gatewayParams, $paymentOptionsScript)
 
 {
-
     $gatewayParams['paramsCartao'] = $_POST;
 
 
-    $errorMessages = array();
 
-    $errorMessages = validationParamsCard($gatewayParams);
-
-    $gnIntegration = new GerencianetIntegration($gatewayParams['clientIdProd'], $gatewayParams['clientSecretProd'], $gatewayParams['clientIdSandbox'], $gatewayParams['clientSecretSandbox'], $gatewayParams['sandbox'], $gatewayParams['idConta']);
-
-    $existingChargeConfirm = existingChargeCredit($gatewayParams, $gnIntegration);
-
-    $existingCharge = $existingChargeConfirm['existCharge'];
-
-    $code = $existingChargeConfirm['code'];
-
-    if ($existingCharge) {
-
-        return $code;
-    }
+    $paymentMethodEfi = PaymentMethodFactory::create('credit_card', $gatewayParams);
 
 
+    $paymentSuccess = $paymentMethodEfi->processPayment();
 
-    $returnPaymentCard = createCard($gatewayParams, $gnIntegration, $errorMessages, $existingCharge);
     $isSubscription = isset($gatewayParams['paramsCartao']['subscriptionCard']);
-    $pagamentoAprovado =  strpos($returnPaymentCard, 'Pagamento Aprovado');
+    $pagamentoAprovado =  strpos($paymentSuccess, 'Pagamento Aprovado');
     if ($isSubscription && $pagamentoAprovado !== false) {
         $invoiceProcessor = new InvoiceProcessor($gatewayParams['invoiceid']);
         $handlerSubscription = new SubscriptionEfiHandler();
@@ -935,6 +909,8 @@ function definedCreditCardPayment($gatewayParams)
             $handlerSubscription->createSchedulePayment(intval($gatewayParams['invoiceid']), $gatewayParams['paramsCartao']['payment_token'], intval($item['relid']));
         }
     }
-
-    return $returnPaymentCard;
+    if ($pagamentoAprovado) {
+        return $paymentSuccess;
+    }
+    return ($paymentSuccess . $paymentOptionsScript);
 }

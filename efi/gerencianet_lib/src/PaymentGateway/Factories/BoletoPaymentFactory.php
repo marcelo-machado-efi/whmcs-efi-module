@@ -7,7 +7,7 @@ use PaymentGateway\Methods\PaymentMethodStrategy;
 use PaymentGateway\DTOs\Client\ClientDTOFactory;
 use PaymentGateway\DTOs\Config\ConfigAPIDTO;
 use PaymentGateway\Methods\Boleto\BoletoConfig;
-use PaymentGateway\Methods\Boleto\Metadata;
+use PaymentGateway\Methods\Boleto\MetadataBillet;
 use PaymentGateway\Methods\Boleto\Discount;
 use PaymentGateway\Methods\Boleto\Configuration;
 use PaymentGateway\Models\Invoice\WHMCSInvoice;
@@ -19,7 +19,7 @@ class BoletoPaymentFactory
     {
         $client = ClientDTOFactory::getClientDTO($orderAttributes, 'boleto');
         $configApi = new ConfigAPIDTO($orderAttributes);
-        $metadata = new Metadata($orderAttributes);
+        $metadata = new MetadataBillet($orderAttributes);
         $discount = new Discount($orderAttributes);
         $configuration = new Configuration($orderAttributes);
         $invoice = new WHMCSInvoice($orderAttributes['invoiceid']);

@@ -10,6 +10,7 @@ use PaymentGateway\Logging\TransactionLogger;
 use PaymentGateway\Models\Invoice\WHMCSInvoice;
 use PaymentGateway\Database\BoletoDAO;
 use Efi\EfiPay;
+use PaymentGateway\Methods\Interfaces\Metadata;
 
 class BoletoPayment implements PaymentMethodStrategy
 {
