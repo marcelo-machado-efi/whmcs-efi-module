@@ -162,13 +162,13 @@ class CreditCardPayment implements PaymentMethodStrategy
         ';
     }
 
-    public function processRefund(string $transactionId): bool
+    public function processRefund(string $transactionId): mixed
     {
         // Implementação do estorno via cartão de crédito
         return "Credit card refund processed for transaction: " . $transactionId;
     }
 
-    public function setupSubscription(array $subscriptionData): bool
+    public function setupSubscription(array $subscriptionData): mixed
     {
         // Implementação da assinatura via cartão de crédito
         return "Credit card subscription setup for: " . $subscriptionData['id'];

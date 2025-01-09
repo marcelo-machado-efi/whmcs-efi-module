@@ -33,8 +33,9 @@ export const handlerValuesInputs = () => {
                         break;
                 }
             } else {
-                form.find('input:not([type="submit"]), textarea, select').val('');
-                form.find('input:not([type="submit"]), textarea, select').closest('.col-12').removeClass('d-none').fadeIn(400);
+                form.find('input:not([type="submit"]):not([type="hidden"]), textarea, select').val('');
+
+                form.find('input:not([type="submit"]):not([type="hidden"]), textarea, select').closest('.col-12').removeClass('d-none').fadeIn(400);
             }
         });
     });

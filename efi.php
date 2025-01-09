@@ -705,9 +705,11 @@ function efi_link($gatewayParams)
 
 
 
+    TransactionLogger::log(json_encode($_POST), TransactionLogger::DEBUG_LOG);
 
 
     if (!isset($_POST['paymentType']) || $_POST['paymentType'] == '') {
+
         return $paymentOptionsScript;
     } else {
 
@@ -796,20 +798,20 @@ function efi_refund($gatewayParams)
 function definedOpenFinancePayment($gatewayParams)
 {
     $gatewayParams['paramsOF'] = $_POST;
+    $payment = PaymentMethodFactory::create("open_finance", $gatewayParams);
+
+    $paymentResult = $payment->processPayment();
     $openFinanceEfi = new OpenFinanceEfi($gatewayParams);
 
-    $openFinanceEfi->validateRequiredParamsOF($gatewayParams);
 
     // Getting API Instance
-    $api_instance = getGerencianetApiInstance($gatewayParams);
 
 
 
-    $responseData = $openFinanceEfi->startOFPayment($api_instance, $gatewayParams);
 
-    $openFinanceEfi->storePaymentIdentifier($responseData['identificadorPagamento'], $gatewayParams['invoiceid']);
+    $openFinanceEfi->storePaymentIdentifier($paymentResult['identificadorPagamento'], $gatewayParams['invoiceid']);
 
-    return "<script type=\"text/javascript\">window.open(\"" . $responseData["redirectURI"] . "\", \"_self\");</script>";
+    return "<script type=\"text/javascript\">window.open(\"" . $paymentResult["redirectURI"] . "\", \"_self\");</script>";
 }
 
 

@@ -142,13 +142,13 @@ class BoletoPayment implements PaymentMethodStrategy
         return $success;
     }
 
-    public function processRefund(string $transactionId): bool
+    public function processRefund(string $transactionId): mixed
     {
         // Implementação do estorno via boleto
         return "Boleto refund processed for transaction: " . $transactionId;
     }
 
-    public function setupSubscription(array $subscriptionData): bool
+    public function setupSubscription(array $subscriptionData): mixed
     {
         // Implementação da assinatura via boleto
         return "Boleto subscription setup for: " . $subscriptionData['id'];

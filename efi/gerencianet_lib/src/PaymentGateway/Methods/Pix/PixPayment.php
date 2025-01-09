@@ -37,7 +37,7 @@ class PixPayment implements PaymentMethodStrategy
     }
 
     /**
-     * Adiciona os valores necessários para configurar o boleto.
+     * Adiciona os valores necessários para configurar o pix.
      */
     private function addValuesToPixConfig(): void
     {

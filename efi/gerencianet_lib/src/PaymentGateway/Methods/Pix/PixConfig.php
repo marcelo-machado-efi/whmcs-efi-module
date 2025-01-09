@@ -3,8 +3,6 @@
 namespace PaymentGateway\Methods\Pix;
 
 use PaymentGateway\Logging\TransactionLogger;
-use DateInterval;
-use DateTime;
 use PaymentGateway\Methods\Pix\Discount;
 use PaymentGateway\Methods\Pix\Pix;
 use PaymentGateway\Methods\Pix\PixFormatter;
@@ -64,7 +62,6 @@ class PixConfig
     {
         try {
             $config = $this->formatter->format($this->payment);
-            TransactionLogger::log(json_encode($config), TransactionLogger::DEBUG_LOG);
 
             return $config;
         } catch (\Throwable $th) {
