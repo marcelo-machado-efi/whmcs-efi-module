@@ -107,9 +107,10 @@ function requiredBilletFields($params)
         }
     }
 
-    if (empty($params['numDiasParaVencimento']) || !(is_numeric($params['numDiasParaVencimento']))) {
-        generateException('O campo dias para vencimento do boleto  não foi preenchido corretamente');
+    if (!is_numeric($params['numDiasParaVencimento'])) {
+        generateException('O campo dias para vencimento do boleto não foi preenchido corretamente');
     }
+
 
     if (!empty($params['fineValue'])) {
         $multa = str_replace(',', '.', $params['fineValue']);
@@ -250,7 +251,7 @@ function verifyCertificatePath($relativePath)
         $resolvedFullPath = realpath($fullPath);
 
         if ($resolvedFullPath && is_readable($resolvedFullPath)) {
-            
+
             if (updateGatewaySetting('pixCert', $resolvedFullPath)) {
                 $message = "<div style=\"line-height: 1.5; word-break: break-all;\">Não foi possível encontrar o certificado no caminho informado: <br>  <strong>'$relativePath'</strong> <br><br>
                 Insira o caminho completo do arquivo, como no exemplo abaixo:<br>
@@ -260,7 +261,6 @@ function verifyCertificatePath($relativePath)
                 generateException($message);
                 return $resolvedFullPath;
             }
-            
         }
     }
 
@@ -283,11 +283,9 @@ function updateGatewaySetting($settingName, $newValue)
     $postData = array(
         'moduleType' => 'gateway',
         'moduleName' => 'efi',
-        'parameters' => array($settingName=>$newValue)
+        'parameters' => array($settingName => $newValue)
     );
     $response = localAPI($command, $postData);
-   
-    return ($response['result'] == 'success');
-   
 
+    return ($response['result'] == 'success');
 }

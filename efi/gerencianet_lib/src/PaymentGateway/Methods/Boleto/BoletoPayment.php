@@ -102,7 +102,9 @@ class BoletoPayment implements PaymentMethodStrategy
                 $chargeId = $responseApiCreateBillet["data"]["charge_id"];
                 $success = $this->addTransactionInvoice($chargeId, $this->invoice->getInvoiceId());
                 $success = $this->saveBoletoDatabase($responseApiCreateBillet);
-                return $success;
+
+
+                return ($success ? $responseApiCreateBillet['data']['pdf']['charge'] : $success);
             }
 
             return false;

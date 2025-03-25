@@ -705,7 +705,6 @@ function efi_link($gatewayParams)
 
 
 
-    TransactionLogger::log(json_encode($_POST), TransactionLogger::DEBUG_LOG);
 
 
     if (!isset($_POST['paymentType']) || $_POST['paymentType'] == '') {
@@ -869,9 +868,7 @@ function definedBilletPayment($gatewayParams)
 
     $paymentSuccess = $paymentMethodEfi->processPayment();
     if ($paymentSuccess) {
-        return '<script type="text/javascript">
-            window.location.reload();
-          </script>';
+        return  buttonGerencianet(null, $paymentSuccess);
     }
 
 
